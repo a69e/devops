@@ -1,8 +1,8 @@
 pipeline {
     agent {
-        Dockerfile true
+        dockerfile true
     }
-    stages {
+    stages ('check version') {
         stage {
             steps {
                 sh 'python --version'
