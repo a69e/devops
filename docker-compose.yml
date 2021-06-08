@@ -1,0 +1,29 @@
+services:
+    react:
+        container_name: react
+        build: ./frontend
+        depends_on:
+            - flask
+        ports:
+            - 3000:3000
+        volumes:
+            #for dev purpose:
+            - ./frontend:/devops/frontend
+            - /devops/frontend/node_modules
+    flask:
+        container_name: flask
+        build: ./backend
+        depends_on:
+            - mongodb
+        ports:
+            - 5000:5000
+        volumes:
+            #for dev purpose:
+            - ./backend:/devops/backend
+            - /devops/backend/venv/
+            - /devops/backend/__pycache__
+    mongodb:
+        container_name: mongodb
+        image: mongo
+        ports:
+            - 27017:27017
