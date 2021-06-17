@@ -129,6 +129,7 @@ export default function App() {
     const navigate = useNavigate();
     const [open, setOpen] = React.useState(false);
     const [ticker, setTicker] = React.useState('HSBC');
+    const [label, setLabel] = React.useState('HSBC');
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -144,6 +145,10 @@ export default function App() {
 
     const handleKeyPress = (event) => {
         if (event.key === 'Enter') { setTicker(event.target.value) }
+    };
+
+    const handleTickerChange = (ticker) => {
+        setLabel(ticker)
     };
 
     return (
@@ -170,7 +175,7 @@ export default function App() {
                     <Typography variant="h6" noWrap>
                         DevOps Practice - Stock Info
                     </Typography>
-                    <Chip label={ticker} clickable color="secondary" onClick={handleClick} style={{ marginLeft: 30 }} />
+                    <Chip label={label} clickable color="secondary" onClick={handleClick} style={{ marginLeft: 30 }} />
                     <div className={classes.search}>
                         <div className={classes.searchIcon}>
                             <SearchIcon />
@@ -226,7 +231,7 @@ export default function App() {
             <main className={classes.content}>
                 <div className={classes.toolbar} />
                 <Routes>
-                    <Route path='/stock/*' element={<DataGrid ticker={ticker}/>} />
+                    <Route path='/stock/*' element={<DataGrid ticker={ticker} onTickerChange={handleTickerChange} />} />
                     <Route path='/github' element={<a href='https://github.com/a69e/devops' target='_blank' >https://github.com/a69e/devops</a>} />
                 </Routes>
             </main>

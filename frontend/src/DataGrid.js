@@ -15,6 +15,7 @@ import { XGrid } from '@material-ui/x-grid';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
+import Snackbar from '@material-ui/core/Snackbar';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -39,9 +40,19 @@ const useStyle = makeStyles((theme) => ({
     },
 }));
 
-export default function DataGrid(ticker) {
+export default function DataGrid({ ticker, onTickerChange }) {
 
     const classes = useStyle();
+
+    const [open, setOpen] = React.useState(false);
+  
+    const handleClose = (event, reason) => {
+      if (reason === 'clickaway') {
+        return;
+      }
+      setOpen(false);
+    };
+
 
     // set table height *********************************************************************
     const [divHeight, setDivHeight] = useState(500);
@@ -72,10 +83,10 @@ export default function DataGrid(ticker) {
 
 
     // get ticker *********************************************************************
-    const [symbol, setSymbol] = useState(ticker['ticker'])
+    const [symbol, setSymbol] = useState('HSBC')
 
     useEffect(() => {
-        setSymbol(ticker['ticker'])
+        setSymbol(ticker)
     }, [ticker])
     // end get ticker *********************************************************************
 
@@ -91,8 +102,11 @@ export default function DataGrid(ticker) {
                     for (let i in res.data) {
                         temp[i]['_id'] = new Date(res.data[i]['_id']['$date']).toUTCString().replace(' 00:00:00 GMT', '').replace(/\w{3}, /, '')
                     };
-                    setData(temp)
-                };
+                    setData(temp);
+                    onTickerChange(symbol)
+                } else {
+                    setOpen(true)
+                }
 
             })
             .catch((error) => { console.log(error) });
@@ -111,7 +125,10 @@ export default function DataGrid(ticker) {
         axios.get('/info/' + symbol)
             .then((res) => {
                 if (res.data !== 'No data' && res.data !== 'Unable to connect') {
-                    setInfo(res.data)
+                    setInfo(res.data);
+                    onTickerChange(symbol)
+                } else {
+                    setOpen(true)
                 }
             })
             .catch((error) => { console.log(error) });
@@ -143,7 +160,10 @@ export default function DataGrid(ticker) {
                         res.data[0]['mutualfund'][i]['Date Reported'] = new Date(temp[i]['Date Reported']['$date']).toUTCString().replace(' 00:00:00 GMT', '').replace(/\w{3}, /, '')
                     };
 
-                    setHolder(res.data)
+                    setHolder(res.data);
+                    onTickerChange(symbol)
+                } else {
+                    setOpen(true)
                 }
             })
             .catch((error) => { console.log(error) });
@@ -168,6 +188,15 @@ export default function DataGrid(ticker) {
 
     return (
         <div style={{ height: divHeight }}>
+            <Snackbar
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'middle',
+                }}
+                open={open}
+                onClose={handleClose}
+                autoHideDuration={5000}
+                message="Symbol not found..." />
             <AppBar position="static" color="default">
                 <Tabs value={false} onChange={handleChange} variant="fullWidth" scrollButtons="on" indicatorColor="primary" textColor="primary" >
                     <Tab label="Chart" value="chart" icon={<ShowChartIcon />} />
